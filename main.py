@@ -157,7 +157,7 @@ def rowTranspositionEncryption(plaintext: str, numberOfCols: int, key=None) -> t
     :return:
     """
     if key is None:
-        key = ''.join(str(i) for i in sample(range(1, numberOfCols + 1), numberOfCols))  # permutacija brojeva od 0..numberOfCols-1
+        key = ''.join(str(i) for i in sample(range(1, numberOfCols + 1), numberOfCols))
 
     plaintext = ''.join([c.lower() for c in plaintext if c != ' '])  # uklanjamo razmake, ostali znaci dozvoljeni
     if numberOfCols > len(plaintext) or len(key) != numberOfCols:
@@ -182,6 +182,31 @@ def rowTranspositionEncryption(plaintext: str, numberOfCols: int, key=None) -> t
     return ''.join(cypher), key
 
 
+def railFenceEncryption(plaintext: str, numLevels: int) -> str:
+    """
+    Rail Fence algoritam radi u nivoima(redovima). Slova originalnog teksta se pisu redom od najviseg ka najmanjeg,
+    pa zatim od najmanjeg ka najvisem. Enkriptovani tekst su slova iz najviseg reda, pa nizeg i tako dalje do najnizeg\n
+    :param plaintext: originalni tekst
+    :param numLevels: broj nivoa u algoritmu
+    :return: enkriptovani tekst, bez razmaka, samo mala slova
+    """
+    plaintext = [c.lower() for c in plaintext if c != ' ']
+    rows = [[] for _ in range(numLevels)]
+    i = 0
+    offset = 1
+    for char in plaintext:
+        rows[i].append(char)
+        if offset > 0 and i == numLevels - 1:
+            offset = -1
+        elif offset < 0 and i == 0:
+            offset = 1
+        i += offset
+    cypher = ""
+    for row in rows:
+        cypher += ''.join(row)
+    return cypher
+
+
 if __name__ == '__main__':
     text = "Napadamo u podne ako ne bude vetra"
     res = caesarEncryption(text, 3)
@@ -195,3 +220,6 @@ if __name__ == '__main__':
     print(res)
     res = rowTranspositionEncryption(res[0], 4, "3142")  # dupla transpozicija
     print(res)
+    res = railFenceEncryption("Septembar je moj srecan rok", 4)
+    print(res)
+
